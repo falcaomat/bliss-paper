@@ -30,20 +30,48 @@ MINUTOS_POR_DO_SOL = 30
 PASTA = Path(__file__).resolve().parent / "wallpapers"
 
 # Numeração (WMO) Organização Meteorológica Mundial
-CHUVA = {55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82}
-NUBLADO = {3, 45, 48, 51, 53}
-NEVE = {71, 73}
-NEVE_FORTE = {75, 85, 86}
-NEVE_GRAO = {77} 
-TEMPESTADE = {95, 96, 99}
+# Cada código aponta para o nome da imagem correspondente (ex: 0 = "ceu-limpo.jpg")
+# Vários códigos podem apontar para a mesma imagem (ex: 55, 56, 57 = "chuva.jpg")
 
-# Qualquer outro número (0 e 1) = Sol
+IMAGEM = {
+    0: "ceu-limpo",
+    1: "quase-limpo",
+    2: "encoberto",
+    3: "encoberto",
+    45: "neblina",
+    48: "neblina",
+    51: "nublado",
+    53: "nublado",
+    55: "nublado",
+    56: "garoa-congelante",
+    57: "garoa-congelante",
+    61: "chuva",
+    63: "chuva",
+    65: "chuva",
+    66: "chuva-congelante",
+    67: "chuva-congelante",
+    71: "neve",
+    73: "neve",
+    75: "neve-forte",
+    77: "neve-grao",
+    80: "chuva-congelante",
+    81: "chuva-congelante",
+    82: "chuva-congelante",
+    85: "neve-forte",
+    86: "neve-forte",
+    95: "tempestade",
+    96: "tempestade-granizo",
+    99: "tempestade-granizo"
 
+}
+
+# Grupos com própria regra de prioridade (ex: se estiver chovendo, não importa se está dia ou noite)
+TEMPESTADE = {95, 96, 99} # Vale de dia e de noite
+CHUVA_NOITE = {51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82} # Vale somente em noite com chuva
 
 def http_json(url):
     with urllib.request.urlopen(url, timeout=15) as r:
         return json.load(r)
-
 
 def obter_localizacao():
     if LATITUDE is not None and LONGITUDE is not None:
@@ -72,40 +100,32 @@ def obter_clima():
     minutos_restantes = (por_do_sol - agora).total_seconds() / 60
     
     if minutos_restantes >= 0:
-        horas = int (minutos_restantes // 60)
-        minutos = int (minutos_restantes % 60)
-        print(f"Faltam {horas}h {minutos:02d} minutos para o pôr do sol") # Confere quanto tempo para o por do sol
+        horas = int(minutos_restantes // 60)
+        minutos = int(minutos_restantes % 60)
+        print(f" >> Faltam {horas}h {minutos:02d} minutos para o pôr do sol") # Confere quanto tempo para o por do sol
     else: 
-        print("O sol já se pôs hoje")
+        print(" >> O sol já se pôs hoje")
+
+    # Ordem de prioridade: tempestade > noite-chuva > noite > por-do-sol 
     
     if codigo in TEMPESTADE:
-        return "tempestade", codigo
+        return IMAGEM[codigo], codigo
+    
     if not momento_atual["is_day"] or minutos_restantes < 0: # 6. Verifica se é dia ou noite
-        if codigo in CHUVA:
+        if codigo in CHUVA_NOITE:
             return "noite-chuva", codigo
         return "noite", codigo
-    if codigo in CHUVA:
-        return "chuva", codigo
-
-    if codigo in NUBLADO:
-        return "nublado", codigo
+    
     if 0 <= minutos_restantes <= MINUTOS_POR_DO_SOL:
-            return "por-do-sol", codigo
-    if codigo in NEVE:
-        return "neve", codigo
-    if codigo in NEVE_GRAO:
-        return "neve-grao", codigo
-    if codigo in NEVE_FORTE:
-        return "neve-forte", codigo
-    return "sol", codigo
+        return "por-do-sol", codigo
+    return IMAGEM.get(codigo, "ceu-limpo"), codigo
 
-
+    
 def achar_imagem(nome):
     p = PASTA / f"{nome}.jpg"
     if p.exists():
         return p
     return None
-
 
 def definir_wallpaper(caminho):
     caminho = str(caminho)
@@ -147,14 +167,15 @@ def definir_wallpaper(caminho):
 def atualizar(ultimo=[None]):
     tipo, codigo = obter_clima()
     img = achar_imagem(tipo)
-    print(f"Clima (código {codigo}) -> {tipo}")
+    print(f" >> Clima (código {codigo}) -> {tipo}")
     if img is None:
-        print(f"Faltando a imagem '{tipo}' em {PASTA}")
+        print(f" >> Faltando a imagem '{tipo}' em {PASTA}")
         return
+    
     if img != ultimo[0]:
         definir_wallpaper(img)
         ultimo[0] = img
-        print(f"Wallpaper: {img.name}")
+        print(f" >> Wallpaper: {img.name}")
 
 
 def main():

@@ -21,15 +21,21 @@ Ele usa poucos recursos: fica parado esperando quase o tempo todo.
 
 ## Imagens
 
-São 10 imagens em **JPG**, e os nomes precisam ser exatamente estes:
+São 16 imagens em **JPG**, e os nomes precisam ser exatamente estes:
 
 | Arquivo | Quando aparece |
 |---|---|
-| `sol.jpg` | Dia de céu limpo |
+| `ceu-limpo.jpg` | Dia de céu limpo |
+| `quase-limpo.jpg` | Quase limpo |
+| `encoberto.jpg` | Parcialmente nublado |
+| `neblina.jpg` | Neblina |
 | `por-do-sol.jpg` | Até 1 hora antes do pôr do sol, com o céu limpo |
 | `nublado.jpg` | Dia nublado |
-| `chuva.jpg` | Chuva e pancadas |
+| `garoa-congelante`| Garoa leve |
+| `chuva.jpg` | Chuva |
+| `chuva-congelante` | Pancadas de Chuvas |
 | `tempestade.jpg` | Tempestade, de dia ou de noite |
+| `tempestade-granizo` | Tempestade com granizo | 
 | `noite.jpg` | Noite |
 | `noite-chuva.jpg` | Noite com chuva |
 | `neve.jpg` | Neve |
@@ -85,11 +91,10 @@ No começo do arquivo `bliss_paper.py`:
 Quando mais de uma condição vale ao mesmo tempo, o programa escolhe nesta ordem:
 
 1. Tempestade
-2. Noite (com ou sem chuva)
-3. Chuva ou Nublado
+2. Noite com chuva
+2. Noite
 4. Pôr do sol
-5. Neve
-5. Sol
+
 
 Por isso, em um fim de tarde nublado ou chuvoso, aparece a imagem do clima e não a do pôr do sol.
 
