@@ -1,0 +1,6 @@
+wallpapers/
+wallpapers.zip
+build/
+dist/
+*.spec
+__pycache__/
